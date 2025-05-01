@@ -2,6 +2,10 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
+from routes import signals  # 👈 NEW import
+
+# And register it:
+app.include_router(signals.router, prefix="/signals")  # 👈 NEW line
 
 # --- Database Setup ---
 DATABASE_URL = "sqlite:///./trading_assistant.db"
