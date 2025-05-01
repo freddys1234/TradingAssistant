@@ -53,6 +53,10 @@ def get_db():
         db.close()
 
 # --- Routes ---
+@app.get("/")
+def root():
+    return {"message": "Trading Assistant Backend is Live!"}
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
