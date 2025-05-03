@@ -23,12 +23,11 @@ class Platform(Base):
 
 class Position(Base):
     __tablename__ = "positions"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     platform_id = Column(Integer, ForeignKey("platforms.id"))
-    symbol = Column(String)
-    quantity = Column(Float)
     entry_price = Column(Float)
+    quantity = Column(Integer)
     take_profit = Column(Float)
     stop_loss = Column(Float)
-    reentry_strategy = Column(String)
-    platform = relationship("Platform", back_populates="positions")
+    reentry_price = Column(Float, nullable=True)
+    status = Column(Enum("open", "closed", name="position_status"), default="open")
