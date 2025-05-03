@@ -1,7 +1,7 @@
 # app/routes/signals.py
 
 from fastapi import APIRouter, Query
-from services.signal import fetch_signals
+from app.services.signal import fetch_signals
 
 router = APIRouter()
 

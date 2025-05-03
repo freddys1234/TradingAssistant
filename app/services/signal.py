@@ -1,7 +1,7 @@
 # services/signal.py
 
-from .ig_api import fetch_ig_signals
-from .ibkr_api import fetch_ibkr_signals
+from app.services.ig_api import fetch_ig_signals
+from app.services.ibkr_api import fetch_ibkr_signals
 
 def fetch_signals(platform: str, identifier: str) -> dict:
     """
