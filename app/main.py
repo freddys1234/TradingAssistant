@@ -20,6 +20,15 @@ def get_db():
     finally:
         db.close()
 
+@app.get("/platforms/")
+def list_platforms(db: Session = Depends(get_db)):
+    return db.query(Platform).all()
+
+@app.get("/users/")
+def list_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
+
+
 # --- Routes ---
 @app.get("/")
 def root():
