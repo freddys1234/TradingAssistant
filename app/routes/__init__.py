@@ -1,1 +1,3 @@
-touch app/routes/__init__.py
+# app/routes/__init__.py
+
+# This file marks the folder as a Python package
