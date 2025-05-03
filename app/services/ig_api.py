@@ -67,7 +67,12 @@ def fetch_ig_signals(symbol: str) -> dict:
         "confidence": 0.85
     }
 
+_epic_cache = {}
+
 def get_epic_for_symbol(symbol: str, cst: str, xst: str) -> str | None:
+    if symbol in _epic_cache:
+        return _epic_cache[symbol]
+
     headers = {
         "X-IG-API-KEY": IG_API_KEY,
         "CST": cst,
@@ -81,11 +86,12 @@ def get_epic_for_symbol(symbol: str, cst: str, xst: str) -> str | None:
     )
 
     if resp.status_code != 200:
-        print(f"[DEBUG] Epic search failed: {resp.status_code} {resp.text}")
         return None
 
     results = resp.json().get("markets", [])
     if not results:
         return None
 
-    return results[0].get("epic")
+    epic = results[0].get("epic")
+    _epic_cache[symbol] = epic
+    return epic

@@ -1,26 +1,24 @@
-# services/signal.py
+# app/services/signal.py
 
 from app.services.ig_api import fetch_ig_signals
 from app.services.ibkr_api import fetch_ibkr_signals
+from app.db import SessionLocal
+from app.models import Platform
 
-def fetch_signals(platform: str, identifier: str) -> dict:
-    """
-    Routes the request to the appropriate platform fetcher.
+def fetch_signals_by_platform_id(platform_id: int, symbol: str) -> dict:
+    db = SessionLocal()
+    try:
+        platform = db.query(Platform).filter(Platform.id == platform_id).first()
+        if not platform:
+            return {"error": f"Platform ID {platform_id} not found"}
 
-    Args:
-        platform (str): Platform name, e.g., "IG" or "IBKR"
-        identifier (str): Epic (for IG) or Ticker (for IBKR)
+        platform_type = platform.type.upper()
 
-    Returns:
-        dict: Signal response from the platform
-    """
-    platform = platform.upper()
-    
-    if platform == "IG":
-        return fetch_ig_signals(identifier)
-    elif platform == "IBKR":
-        return fetch_ibkr_signals(identifier)
-    else:
-        return {
-            "error": f"Unsupported platform '{platform}'"
-        }
+        if platform_type == "IG":
+            return fetch_ig_signals(symbol)
+        elif platform_type == "IBKR":
+            return fetch_ibkr_signals(symbol)
+        else:
+            return {"error": f"Unsupported platform type: {platform_type}"}
+    finally:
+        db.close()
