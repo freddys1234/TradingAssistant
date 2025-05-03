@@ -1,10 +1,10 @@
-# routes/signals.py
+# app/routes/signals.py
 
 from fastapi import APIRouter, Query
 from services.signal import fetch_signals
 
 router = APIRouter()
 
-@router.get("/signals/")
+@router.get("/")
 def get_signal(platform: str = Query(...), identifier: str = Query(...)):
     return fetch_signals(platform, identifier)

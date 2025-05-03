@@ -49,9 +49,6 @@ class Position(Base):
     reentry_strategy = Column(String)
     platform = relationship("Platform", back_populates="positions")
 
-# --- App Initialization ---
-app = FastAPI()
-
 # --- Dependency ---
 def get_db():
     db = SessionLocal()
