@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 
-from routes import signals  # 👈 Import here is fine
+from app.routes import signals  # ✅ Fully qualified import
 
 # --- App Initialization ---
 app = FastAPI()  # 👈 MUST come before using `app`
