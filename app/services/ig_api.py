@@ -37,8 +37,12 @@ def get_ig_session():
 
     return cst, x_security_token
 
-def fetch_ig_signals(epic: str) -> dict:
+def fetch_ig_signals(symbol: str) -> dict:
     cst, xst = get_ig_session()
+
+    epic = get_epic_for_symbol(symbol, cst, xst)
+    if not epic:
+        return {"error": f"Could not find epic for symbol '{symbol}'"}
 
     headers = {
         "X-IG-API-KEY": IG_API_KEY,
@@ -55,14 +59,33 @@ def fetch_ig_signals(epic: str) -> dict:
     if resp.status_code != 200:
         return {"error": "Could not fetch market data"}
 
-    market_data = resp.json()
-    snapshot = market_data.get("snapshot", {})
-    bid = snapshot.get("bid")
-    offer = snapshot.get("offer")
-
+    data = resp.json().get("snapshot", {})
     return {
         "platform": "IG",
         "epic": epic,
-        "signal": "BUY" if bid and offer and bid < offer else "HOLD",
-        "confidence": 0.9
+        "signal": "BUY" if data.get("bid") < data.get("offer") else "HOLD",
+        "confidence": 0.85
     }
+
+def get_epic_for_symbol(symbol: str, cst: str, xst: str) -> str | None:
+    headers = {
+        "X-IG-API-KEY": IG_API_KEY,
+        "CST": cst,
+        "X-SECURITY-TOKEN": xst,
+        "Accept": "application/json"
+    }
+
+    resp = requests.get(
+        f"{IG_BASE_URL}/markets?searchTerm={symbol}",
+        headers=headers
+    )
+
+    if resp.status_code != 200:
+        print(f"[DEBUG] Epic search failed: {resp.status_code} {resp.text}")
+        return None
+
+    results = resp.json().get("markets", [])
+    if not results:
+        return None
+
+    return results[0].get("epic")
