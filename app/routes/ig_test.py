@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from services.ig_api import get_ig_price
+from app.services.ig_api import get_ig_price  # ✅ absolute import
 
 router = APIRouter()
 
