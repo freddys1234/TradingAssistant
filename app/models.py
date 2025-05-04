@@ -2,18 +2,17 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app.db import Base
 
-from sqlalchemy.orm import relationship
-from app.db import Base
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     name = Column(String)
+
     platforms = relationship("Platform", back_populates="user")
 
 class Platform(Base):
     __tablename__ = "platforms"
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     name = Column(String)
@@ -21,16 +20,21 @@ class Platform(Base):
     currency = Column(String)
     fee = Column(Float)
     daily_budget = Column(Float, nullable=True)
-    user = relationship("User", back_populates="platforms")
-    positions = relationship("Position", back_populates="platform")
+
+    user = relationship("User", back_populates="platforms")            # ✅ ADD THIS
+    positions = relationship("Position", back_populates="platform")    # ✅ This is already good
 
 class Position(Base):
     __tablename__ = "positions"
-    id = Column(Integer, primary_key=True)
+
+    id = Column(Integer, primary_key=True, index=True)
     platform_id = Column(Integer, ForeignKey("platforms.id"))
+    symbol = Column(String)
+    quantity = Column(Float)
     entry_price = Column(Float)
-    quantity = Column(Integer)
     take_profit = Column(Float)
     stop_loss = Column(Float)
-    reentry_price = Column(Float, nullable=True)
-    status = Column(Enum("open", "closed", name="position_status"), default="open")
+    reentry_strategy = Column(String)
+    status = Column(String, default="open")
+
+    platform = relationship("Platform", back_populates="positions")
