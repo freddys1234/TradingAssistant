@@ -3,3 +3,5 @@ uvicorn
 sqlalchemy
 requests
 psycopg2-binary
+pandas
+ib_insync
