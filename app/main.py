@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from app.db import Base, engine, SessionLocal
-from app.routes import signals
+from app.routes import signals, platforms
 from app.models import User, Platform, Position
 
 # --- App Initialization ---
@@ -11,6 +11,8 @@ app = FastAPI()  # 👈 MUST come before using `app`
 # --- Register Routes ---
 app.include_router(signals.router, prefix="/signals")  # 👈 Moved here
 
+from app.routes import platforms
+app.include_router(platforms.router)
 
 # --- Dependency ---
 def get_db():
@@ -46,21 +48,72 @@ def create_user(email: str, name: str, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+from pydantic import BaseModel
+
+class PlatformCreate(BaseModel):
+    name: str
+    type: str
+    currency: str
+    fee: float
+    daily_budget: float | None = None
+
 @app.post("/platforms/{user_id}")
-def create_platform(user_id: int, name: str, type: str, currency: str, fee: float, daily_budget: float = None, db: Session = Depends(get_db)):
-    db_platform = Platform(user_id=user_id, name=name, type=type, currency=currency, fee=fee, daily_budget=daily_budget)
+def create_platform(user_id: int, platform: PlatformCreate, db: Session = Depends(get_db)):
+    db_platform = Platform(
+        user_id=user_id,
+        name=platform.name,
+        type=platform.type,
+        currency=platform.currency,
+        fee=platform.fee,
+        daily_budget=platform.daily_budget
+    )
     db.add(db_platform)
     db.commit()
     db.refresh(db_platform)
     return db_platform
 
+class PositionCreate(BaseModel):
+    symbol: str
+    quantity: float
+    entry_price: float
+    take_profit: float
+    stop_loss: float
+    reentry_strategy: str
+
 @app.post("/positions/{platform_id}")
-def create_position(platform_id: int, symbol: str, quantity: float, entry_price: float, take_profit: float, stop_loss: float, reentry_strategy: str, db: Session = Depends(get_db)):
-    db_position = Position(platform_id=platform_id, symbol=symbol, quantity=quantity, entry_price=entry_price, take_profit=take_profit, stop_loss=stop_loss, reentry_strategy=reentry_strategy)
+def create_position(platform_id: int, position: PositionCreate, db: Session = Depends(get_db)):
+    db_position = Position(
+        platform_id=platform_id,
+        symbol=position.symbol,
+        quantity=position.quantity,
+        entry_price=position.entry_price,
+        take_profit=position.take_profit,
+        stop_loss=position.stop_loss,
+        reentry_strategy=position.reentry_strategy
+    )
     db.add(db_position)
     db.commit()
     db.refresh(db_position)
     return db_position
+
+@app.get("/positions/{position_id}/evaluate")
+def evaluate_position(position_id: int, db: Session = Depends(get_db)):
+    position = db.query(Position).filter(Position.id == position_id).first()
+    if not position:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    platform = db.query(Platform).filter(Platform.id == position.platform_id).first()
+    if not platform:
+        raise HTTPException(status_code=404, detail="Platform not found")
+
+    # Replace with real pricing logic; for now use a placeholder
+    current_price = position.entry_price + 2.0  # Mock price just above entry
+
+    from app.services.strategy import StrategyEngine  # Import locally to avoid circular issues
+    strategy = StrategyEngine(position, current_price, platform.fee)
+    signal, reason, pl = strategy.evaluate()
+
+    return {"signal": signal, "reason": reason, "profit_loss": pl}
 
 # --- Create DB Schema ---
 Base.metadata.create_all(bind=engine)
