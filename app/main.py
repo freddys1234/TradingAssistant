@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.db import Base, engine, SessionLocal
 from app.routes import signals, platforms
 from app.models import User, Platform, Position
+from app.db import get_db
 
 # --- App Initialization ---
 app = FastAPI()  # 👈 MUST come before using `app`
@@ -13,14 +14,6 @@ app.include_router(signals.router, prefix="/signals")  # 👈 Moved here
 
 from app.routes import platforms
 app.include_router(platforms.router)
-
-# --- Dependency ---
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.get("/platforms/")
 def list_platforms(db: Session = Depends(get_db)):
