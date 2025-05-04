@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
 import * as Notifications from 'expo-notifications';
@@ -42,7 +41,7 @@ export default function App() {
       }
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       console.log("Expo Push Token:", token);
-      // You can POST this token to your FastAPI backend here
+      // Send token to backend here
     } else {
       alert('Must use physical device for Push Notifications');
     }
