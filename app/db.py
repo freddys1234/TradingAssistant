@@ -16,3 +16,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# db.py
+
+from app.models import Platform
+from sqlalchemy.orm import Session
+from app.db import SessionLocal  # adjust for your setup
+
+def get_platform_by_id(platform_id: int) -> Platform:
+    db: Session = SessionLocal()
+    return db.query(Platform).filter(Platform.id == platform_id).first()

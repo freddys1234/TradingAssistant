@@ -22,3 +22,32 @@ def fetch_signals_by_platform_id(platform_id: int, symbol: str) -> dict:
             return {"error": f"Unsupported platform type: {platform_type}"}
     finally:
         db.close()
+# services/signal.py
+
+from services.ig_api import get_ig_price
+from services.ibkr_api import get_ibkr_price
+from app.db import get_platform_by_id  # Adjust if needed
+
+# Optional: simple in-memory cache to avoid duplicate lookups per run
+_price_cache = {}
+
+def fetch_current_price(epic: str, platform_id: int) -> float:
+    cache_key = f"{epic}_{platform_id}"
+    if cache_key in _price_cache:
+        return _price_cache[cache_key]
+
+    platform = get_platform_by_id(platform_id)
+    if not platform:
+        raise ValueError(f"Platform with ID {platform_id} not found.")
+
+    platform_type = platform.name.lower()
+    
+    if "ig" in platform_type:
+        price = get_ig_price(epic)
+    elif "ibkr" in platform_type:
+        price = get_ibkr_price(epic)
+    else:
+        raise ValueError(f"Unsupported platform: {platform.name}")
+
+    _price_cache[cache_key] = price
+    return price

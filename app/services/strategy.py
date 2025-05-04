@@ -1,3 +1,49 @@
+# services/strategy.py
+
+from app.db import get_user_platforms, get_platform_positions  # Adjust if needed
+from app.models import Position  # Adjust import to match your structure
+
+def evaluate_position_strategy(position: Position):
+    """
+    Evaluate strategy for a single position (TP, SL, re-entry).
+    Returns one of: HOLD, BUY, SELL, ALERT
+    """
+    price = fetch_current_price(position.epic, position.platform_id)  # implement separately
+    action = "HOLD"
+
+    # Example strategy logic (replace with your own rules)
+    if price >= position.take_profit:
+        action = "SELL"
+    elif price <= position.stop_loss:
+        action = "SELL"
+    elif price <= position.reentry_price:
+        action = "BUY"
+
+    return {
+        "epic": position.epic,
+        "current_price": price,
+        "action": action,
+        "tp": position.take_profit,
+        "sl": position.stop_loss,
+        "reentry": position.reentry_price,
+    }
+
+def run_strategy_for_user(user_id):
+    """
+    Runs strategy checks for all positions across all platforms for the given user.
+    Returns a list of evaluated results.
+    """
+    platforms = get_user_platforms(user_id)
+    all_results = []
+
+    for platform in platforms:
+        positions = get_platform_positions(platform.id)
+        for pos in positions:
+            result = evaluate_position_strategy(pos)
+            all_results.append(result)
+
+    return all_results
+
 class StrategyEngine:
     def __init__(self, position, current_price, trading_fee):
         self.position = position
