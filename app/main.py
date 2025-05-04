@@ -6,6 +6,7 @@ from app.routes import signals, platforms
 from app.models import User, Platform, Position
 from app.db import get_db
 from app.routes import ig_test
+from app.routes import positions
 
 from app.services.db_utils import get_platform_by_id
 
@@ -14,6 +15,7 @@ from app.services.db_utils import get_platform_by_id
 app = FastAPI()  # 👈 MUST come before using `app`
 
 app.include_router(ig_test.router)
+app.include_router(positions.router, prefix="/positions")
 
 # --- Register Routes ---
 app.include_router(signals.router, prefix="/signals")  # 👈 Moved here

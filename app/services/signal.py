@@ -52,3 +52,12 @@ def fetch_current_price(epic: str, platform_id: int) -> float:
 
     _price_cache[cache_key] = price
     return price
+
+
+from app.services.strategy import SpreadBetStrategyEngine
+
+def evaluate_ig_spread_position(position, price, fee):
+    """
+    Entry point for evaluating IG spread bet position.
+    """
+    return SpreadBetStrategyEngine.evaluate(position, price, fee)

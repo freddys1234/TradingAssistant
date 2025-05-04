@@ -84,3 +84,33 @@ def evaluate(self):
 
     return 'HOLD', 'No action required', 0
 
+
+
+class SpreadBetStrategyEngine:
+    @staticmethod
+    def evaluate(position, price, fee):
+        """
+        Evaluates IG spread bet position and returns decision.
+        """
+        entry = position.entry_price
+        tp = position.take_profit
+        sl = position.stop_loss
+        stake = position.stake or 1.0  # Default if not set
+        spread = price - entry
+        pnl = (price - entry) * stake - fee
+
+        if price >= tp:
+            status = "TAKE_PROFIT"
+        elif price <= sl:
+            status = "STOP_LOSS"
+        else:
+            status = "HOLD"
+
+        return {
+            "symbol": position.symbol,
+            "entry_price": entry,
+            "current_price": price,
+            "pnl": round(pnl, 2),
+            "stake": stake,
+            "status": status,
+        }
