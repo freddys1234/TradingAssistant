@@ -25,7 +25,7 @@ def fetch_signals_by_platform_id(platform_id: int, symbol: str) -> dict:
 # services/signal.py
 
 from app.services.ig_api import get_ig_price
-from services.ibkr_api import get_ibkr_price
+from app.services.ibkr_api import get_ibkr_price
 from app.db import get_platform_by_id  # Adjust if needed
 
 # Optional: simple in-memory cache to avoid duplicate lookups per run
