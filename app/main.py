@@ -5,7 +5,6 @@ from app.db import Base, engine, SessionLocal
 from app.routes import signals, platforms
 from app.models import User, Platform, Position
 from app.db import get_db
-from app.db import get_session
 from app.routes import ig_test
 
 
