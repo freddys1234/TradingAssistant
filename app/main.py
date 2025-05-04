@@ -41,6 +41,10 @@ def create_user(email: str, name: str, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return db_user
 
+@app.get("/positions/")
+def list_positions(db: Session = Depends(get_db)):
+    return db.query(Position).all()
+
 from pydantic import BaseModel
 
 class PlatformCreate(BaseModel):
