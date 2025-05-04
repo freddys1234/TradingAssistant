@@ -5,14 +5,19 @@ from app.db import Base, engine, SessionLocal
 from app.routes import signals, platforms
 from app.models import User, Platform, Position
 from app.db import get_db
+from app.db import get_session
+from app.routes import ig_test
+
+
 
 # --- App Initialization ---
 app = FastAPI()  # 👈 MUST come before using `app`
 
+app.include_router(ig_test.router)
+
 # --- Register Routes ---
 app.include_router(signals.router, prefix="/signals")  # 👈 Moved here
 
-from app.routes import platforms
 app.include_router(platforms.router)
 
 @app.get("/platforms/")
@@ -117,8 +122,6 @@ def evaluate_position(position_id: int, db: Session = Depends(get_db)):
 
     return {"signal": signal, "reason": reason, "profit_loss": pl}
 
-from routes import ig_test
-app.include_router(ig_test.router)
 
 # --- Create DB Schema ---
 Base.metadata.create_all(bind=engine)
