@@ -33,6 +33,11 @@ def root():
 def health():
     return {"status": "ok"}
 
+@app.get("/run-daily")
+def run_daily():
+    scheduler.run_daily_strategy_check()
+    return {"status": "done"}
+
 @app.post("/users/")
 def create_user(email: str, name: str, db: Session = Depends(get_db)):
     db_user = User(email=email, name=name)

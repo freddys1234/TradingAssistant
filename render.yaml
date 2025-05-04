@@ -8,3 +8,7 @@ services:
     envVars:
       - key: DATABASE_URL
         value: sqlite:///trading_assistant.db
+cron:
+  - name: daily-check
+    schedule: "0 8 * * *"  # every day at 8:00 AM UTC
+    path: /run-daily
