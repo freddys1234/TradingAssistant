@@ -32,6 +32,4 @@ class Position(Base):
     take_profit = Column(Float)
     stop_loss = Column(Float)
     reentry_strategy = Column(String)
-    stake = Column(Float, nullable=True)
-    spread_bet = Column(Integer, default=0)
-    platform = relationship('Platform', back_populates='positions')
+    platform = relationship("Platform", back_populates="positions")

@@ -40,8 +40,3 @@ def fetch_current_price(epic: str, platform_id: int) -> float:
         raise ValueError(f'Unsupported platform: {platform.name}')
     _price_cache[cache_key] = price
     return price
-from app.services.strategy import SpreadBetStrategyEngine
-
-def evaluate_ig_spread_position(position, price, fee):
-    '\n    Entry point for evaluating IG spread bet position.\n    '
-    return SpreadBetStrategyEngine.evaluate(position, price, fee)

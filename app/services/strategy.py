@@ -57,27 +57,11 @@ def evaluate(self):
     if (self.position.status == 'open'):
         (signal, reason) = self.check_tp_sl()
         pl = self.calculate_pl()
-        return (signal, reason, pl)
-    elif (self.position.status == 'closed'):
-        (signal, reason) = self.check_reentry()
-        return (signal, reason, 0)
-    return ('HOLD', 'No action required', 0)
+        return signal, reason, pl
 
-class SpreadBetStrategyEngine():
+    elif self.position.status == 'closed':
+        signal, reason = self.check_reentry()
+        return signal, reason, 0
 
-    @staticmethod
-    def evaluate(position, price, fee):
-        '\n        Evaluates IG spread bet position and returns decision.\n        '
-        entry = position.entry_price
-        tp = position.take_profit
-        sl = position.stop_loss
-        stake = (position.stake or 1.0)
-        spread = (price - entry)
-        pnl = (((price - entry) * stake) - fee)
-        if (price >= tp):
-            status = 'TAKE_PROFIT'
-        elif (price <= sl):
-            status = 'STOP_LOSS'
-        else:
-            status = 'HOLD'
-        return {'symbol': position.symbol, 'entry_price': entry, 'current_price': price, 'pnl': round(pnl, 2), 'stake': stake, 'status': status}
+    return 'HOLD', 'No action required', 0
+
