@@ -117,5 +117,8 @@ def evaluate_position(position_id: int, db: Session = Depends(get_db)):
 
     return {"signal": signal, "reason": reason, "profit_loss": pl}
 
+from routes import ig_test
+app.include_router(ig_test.router)
+
 # --- Create DB Schema ---
 Base.metadata.create_all(bind=engine)
