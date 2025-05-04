@@ -7,7 +7,7 @@ from app.models import User, Platform, Position
 from app.db import get_db
 from app.routes import ig_test
 
-from app.services.db_utils import get_platform_by_id  ✅
+from app.services.db_utils import get_platform_by_id
 
 
 # --- App Initialization ---
